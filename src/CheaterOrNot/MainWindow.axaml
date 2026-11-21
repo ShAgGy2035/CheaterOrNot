@@ -1,0 +1,210 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="CheaterOrNot.MainWindow"
+        Icon="/Assets/question-mark.png"
+        Title="Cheater or Not" Width="1360" Height="820" MinWidth="760" MinHeight="600"
+        Background="#101827">
+    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" Margin="24">
+        <StackPanel Spacing="6" Margin="0,0,0,20">
+            <TextBlock Text="CHEATER OR NOT" FontSize="30" FontWeight="Bold" Foreground="#63D8BD"/>
+            <TextBlock Text="Counter-Strike 2 | Public evidence, not accusations" Foreground="#BCC8D9"/>
+            <TextBlock Text="Public website statistics and optional local demo review. Neither can confirm cheating or clean play."
+                       TextWrapping="Wrap" Foreground="#BCC8D9"/>
+            <WrapPanel Orientation="Horizontal">
+                <Button x:Name="ImportDemoButton" Content="Import local CS2 demo" Click="ImportDemoClick" Margin="0,0,8,4"/>
+                <Button x:Name="ImportGeminiDemoButton" Content="Analyze demo with Gemini" Click="ImportGeminiDemoClick" Margin="0,0,0,4"/>
+                <Button x:Name="VideoComponentsButton" Content="Advanced video tools" Click="VideoComponentsClick" Margin="8,0,0,4"/>
+                <Button x:Name="GeminiDiagnosticButton" Content="Gemini connection diagnostic" Click="GeminiDiagnosticClick" Margin="8,0,0,4"/>
+            </WrapPanel>
+            <TextBlock Text="Analyze demo: choose a .dem to import, capture fresh clips for every eligible human-vs-human kill, then review the clip/request counts and confirm before sending video, available game audio and telemetry to Google. Player voices are requested off. Footage may identify players; Google data-use terms, quotas and possible charges apply. Requires a saved Gemini key and capture tools. New capture requires Steam/CS2 installed and CS2 closed, and may take several minutes."
+                       TextWrapping="Wrap" Foreground="#BCC8D9"/>
+        </StackPanel>
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto,Auto,Auto,Auto" Margin="0,0,0,16">
+            <TextBox x:Name="PlayerInput" PlaceholderText="SteamID64 or profile URL - separate several players with spaces or commas" Margin="0,0,10,0"/>
+            <Button Grid.Column="1" x:Name="FetchButton" Content="Check player" Click="FetchClick" Margin="0,0,8,0"/>
+            <Button Grid.Column="2" x:Name="FetchWithAiButton" Content="Check player with AI" Click="FetchWithAiClick" Margin="0,0,8,0"/>
+            <Button Grid.Column="3" x:Name="CancelButton" Content="Cancel" Click="CancelClick" IsEnabled="False" Margin="0,0,8,0"/>
+            <Button Grid.Column="4" x:Name="ClearButton" Content="Clear player data" Click="ClearClick" Margin="0,0,8,0"/>
+            <Button Grid.Column="5" x:Name="SaveButton" Content="Save report" Click="SaveClick" IsEnabled="False"/>
+        </Grid>
+        <StackPanel Grid.Row="2" Spacing="6" Margin="0,0,0,10">
+            <TextBlock x:Name="StatusText" Text="Enter a player ID and press Check player." TextWrapping="Wrap"/>
+            <TextBlock Text="Check player with AI sends assessed stats to Google Gemini, not names or SteamIDs. A saved Gemini key is required; quotas and charges may apply."
+                       TextWrapping="Wrap" Foreground="#BCC8D9"/>
+            <StackPanel x:Name="ProgressPanel" IsVisible="False" Spacing="6">
+                <ProgressBar x:Name="CheckProgress" Minimum="0" Maximum="1" Value="0"
+                             Height="10" Foreground="#63D8BD"/>
+                <TextBlock x:Name="ProgressDetails" TextWrapping="Wrap" Foreground="#BCC8D9"/>
+            </StackPanel>
+            <Button x:Name="OpenBlockedButton" IsVisible="False" Click="OpenBlockedClick"
+                    HorizontalAlignment="Left" Background="#1E2A3D" Foreground="#63D8BD"
+                    Padding="10,6" Margin="0,2,0,0"/>
+            <StackPanel x:Name="ReportSelector" IsVisible="False" Orientation="Horizontal" Spacing="12">
+                <TextBlock Text="Report:" VerticalAlignment="Center"/>
+                <RadioButton x:Name="WebsiteReportButton" GroupName="ReportSource" Content="Website" IsCheckedChanged="ReportSourceChanged"/>
+                <RadioButton x:Name="DemoReportButton" GroupName="ReportSource" Content="Demo" IsCheckedChanged="ReportSourceChanged"/>
+            </StackPanel>
+        </StackPanel>
+        <TabControl Grid.Row="3" x:Name="MainTabs">
+            <TabItem x:Name="FinalResultTab" Header="Final result">
+                <Grid RowDefinitions="Auto,*" Margin="0,12,0,0">
+                    <DockPanel Margin="0,0,0,8">
+                        <Button x:Name="RetryWebsiteAiButton" Content="Retry AI review"
+                                Click="RetryWebsiteAiClick" IsEnabled="False" IsVisible="False"
+                                Margin="0,0,8,0"/>
+                        <Button DockPanel.Dock="Right" x:Name="CopyFinalButton" Content="Copy all"
+                                Click="CopyReportClick" IsEnabled="False"/>
+                    </DockPanel>
+                    <TextBox Grid.Row="1" x:Name="FinalResultBox" IsReadOnly="True" AcceptsReturn="True"
+                             PlaceholderText="Check a player or import a demo to see results here."
+                             TextWrapping="Wrap" FontFamily="Consolas,monospace"/>
+                </Grid>
+            </TabItem>
+            <TabItem x:Name="EvidenceTab" Header="Evidence">
+                <Grid RowDefinitions="Auto,Auto,*" Margin="0,12,0,0">
+                    <DockPanel Margin="0,0,0,8">
+                        <Button DockPanel.Dock="Right" x:Name="CopyEvidenceButton" Content="Copy all" Click="CopyReportClick" IsEnabled="False"/>
+                        <Button x:Name="UseDemoRosterButton" Content="Use roster for checks" Click="UseDemoRosterClick"
+                                IsEnabled="False" IsVisible="False" HorizontalAlignment="Left"/>
+                    </DockPanel>
+                    <Expander Grid.Row="1" x:Name="DemoRequestExpander" Header="Exact request preview" IsVisible="False" Margin="0,0,0,8">
+                        <StackPanel Spacing="6">
+                            <TextBlock x:Name="GeminiDestinationText" TextWrapping="Wrap"/>
+                            <WrapPanel Orientation="Horizontal">
+                                <Button x:Name="CopyGeminiButton" Content="Copy preview" Click="CopyReportClick" IsEnabled="False" Margin="0,0,8,4"/>
+                                <Button Content="Open Gemini website" Click="OpenGeminiWebsiteClick" Margin="0,0,8,4"/>
+                                <Button x:Name="SendGeminiButton" Content="Send summary to Gemini" Click="SendGeminiClick" IsEnabled="False" Margin="0,0,8,4"/>
+                            </WrapPanel>
+                            <TextBox x:Name="GeminiPreviewBox" IsReadOnly="True" AcceptsReturn="True" MaxHeight="180"
+                                     TextWrapping="Wrap" FontFamily="Consolas,monospace"/>
+                        </StackPanel>
+                    </Expander>
+                    <TextBox Grid.Row="2" x:Name="ReportBox" IsReadOnly="True" AcceptsReturn="True"
+                             TextWrapping="NoWrap" ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                             FontFamily="Consolas,monospace"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Screening rules">
+                <Grid Margin="0,12,0,0" RowDefinitions="Auto,*,Auto">
+                    <TextBlock TextWrapping="Wrap" Foreground="#BCC8D9"
+                               Text="Rules are unvalidated screening heuristics, not proof of cheating or clean play. Professional examples are context only; conditions differ. Existing reports do not change; saved settings apply to the next check."/>
+                    <Grid Grid.Row="1" ColumnDefinitions="3*,2*" Margin="0,8,0,0">
+                        <Grid Grid.Column="0" RowDefinitions="Auto,*" Margin="0,0,12,0">
+                            <TextBlock Text="RULE DETAILS" FontWeight="Bold" Foreground="#63D8BD" Margin="0,0,0,8"/>
+                            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                <StackPanel Spacing="12">
+                                    <TextBlock x:Name="CoreRulesDetails" TextWrapping="Wrap"/>
+                                    <TextBlock TextWrapping="Wrap" Text="Utility-to-frag: if sample K/D meets UtilityMinimumKd, flag utility damage per match below UtilityDamageThreshold. The K/D gate restricts this comparison to higher-frag samples; roles, modes and play style can explain low utility."/>
+                                    <TextBlock TextWrapping="Wrap" Text="Recent K/D jump: flag a recent-minus-lifetime gap at or above RecentKdJumpThreshold when recent K/D meets RecentMinimumKd and exceeds the lifetime value. Both values are from separate, potentially overlapping CSTracker panels. Improvement, opponents and sample selection can explain a jump; it does not identify when or why a change occurred."/>
+                                    <TextBlock TextWrapping="Wrap" Text="Weapon accuracy spread: after WeaponMinimumKills and WeaponMinimumShots per weapon, at least WeaponMinimumCount weapons across WeaponMinimumCategories recognized categories must qualify. Flag when the difference between highest and lowest accuracy is below WeaponSpreadPercentThreshold percentage points. The gates reduce small-sample and same-category comparisons, but weapon choice and shot selection still matter."/>
+                                    <TextBlock TextWrapping="Wrap" Text="Map K/D: maps need MapMinimumMatches each, with at least MapMinimumCount qualifying maps. When the best K/D meets MapMinimumBestKd and the median of the other maps is positive, flag a best-to-median ratio at or above MapOutlierRatioThreshold. Comfort maps and opponent differences can explain gaps."/>
+                                    <TextBlock x:Name="OpeningRuleDetails" TextWrapping="Wrap"/>
+                                    <TextBlock TextWrapping="Wrap" Text="K/D oscillation: split history into complete blocks of OscillationBlockSize matches. With at least OscillationMinimumBlocks, count blocks at or above OscillationHighKd and at or below OscillationLowKd. Flag when each count reaches OscillationExtremeBlocks. This counts extremes, not their order; it cannot detect toggling."/>
+                                    <TextBlock TextWrapping="Wrap" Text="METRIC DEFINITIONS AND PROVENANCE&#10;&#10;App-calculated from verified counters: CSTracker history K/D = summed kills / summed deaths; CSTracker detailed headshot kills % = headshot kills / kills x 100; profile win rate = wins / (wins + losses) x 100, excluding ties; csst.at opening-duel win rate = won / (won + lost) x 100; Leetify/CSTracker weapon spread = highest qualifying accuracy - lowest qualifying accuracy; Steam weapon accuracy = hits / shots x 100; block and map ratios use their own stated counters. Zero denominators remain unavailable rather than becoming zero or infinity.&#10;&#10;Source-calculated and displayed: Leetify recent K/D, headshot-kill percentage and win-rate fraction; csst.at K/D and K/R; CSTracker TTD, preaim, aim offset, HLTV rating, KAST, ADR and accuracy. The app validates plausible types, ranges, units and available totals, then applies the published cutoff. It does not claim to reproduce source-specific rating, timing, damage or percentile formulas when the raw event inputs are not published.&#10;&#10;Unscored context: utility/team behavior and additional aim, flash, trade, damage, spray, counter-strafing and AFK fields are retained as source-reported values. Public-tab breakdowns may use different eligible-event scopes or denominators from scored totals; they are not reconciled, merged or substituted into calculations. Head accuracy, spray accuracy and overall accuracy are not headshot-kill percentage. A metric without a verified denominator can be displayed but not independently recalculated or used as proof."/>
+                                    <TextBlock x:Name="WebsiteRulesDetails" TextWrapping="Wrap"/>
+                                    <TextBlock x:Name="ProReferenceSource" TextWrapping="Wrap" Foreground="#BCC8D9"/>
+                                    <TextBlock TextWrapping="Wrap" Text="Account bans and CSTracker utility, team-behavior and extra aim fields are separate context, not statistical flags unless a documented rule is explicitly applied. Samples from different sites or non-comparable windows are never merged. Within one site, the largest sample is retained for a duplicate metric; equally sized equivalent samples prefer the newer published data timestamp. Repeated values from different sources are displayed separately and counted only once by metric type for the verdict. Failing to assess a rule is not a pass.&#10;&#10;EDITING: Change numeric values on the right, keep every JSON field and use a decimal point. Percent values use 0-100. Save rules applies the changes to future checks. Restore defaults loads original values for review; save to apply them."/>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </Grid>
+                        <Grid Grid.Column="1" RowDefinitions="Auto,*">
+                            <TextBlock Text="RULE SETTINGS (JSON)" FontWeight="Bold" Foreground="#63D8BD" Margin="0,0,0,8"/>
+                            <TextBox Grid.Row="1" x:Name="RulesEditor" AcceptsReturn="True" TextWrapping="NoWrap"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Auto" FontFamily="Consolas,monospace"/>
+                        </Grid>
+                    </Grid>
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
+                        <Button x:Name="SaveRulesButton" Content="Save rules" Click="SaveRulesClick"/>
+                        <Button x:Name="DefaultRulesButton" Content="Restore defaults" Click="DefaultRulesClick"/>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+            <TabItem Header="API Keys">
+              <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="0,12,0,0" Spacing="10" MaxWidth="700" HorizontalAlignment="Left">
+                    <TextBlock Text="Steam Web API key (optional)" FontWeight="Bold" Foreground="#63D8BD"/>
+                    <TextBlock TextWrapping="Wrap" Foreground="#BCC8D9"
+                               Text="Adds Valve's official data: VAC and game-ban counts, Steam community level, and lifetime statistics when available. If Steam Community did not supply a usable display name, the app can request the public Steam display name from Valve's Web API. The key is sent only to api.steampowered.com and never appears in reports or evidence."/>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBox x:Name="SteamKeyBox" Width="320" PasswordChar="&#x2022;" PlaceholderText="32-character key"/>
+                        <Button x:Name="SaveKeyButton" Content="Save key" Click="SaveKeyClick"/>
+                        <Button x:Name="RemoveKeyButton" Content="Remove key" Click="RemoveKeyClick"/>
+                        <Button Content="Get a free Steam key" Click="OpenKeyPageClick"/>
+                    </StackPanel>
+                    <Button x:Name="TestSteamKeyButton" Content="Test saved Steam key" Click="TestSteamKeyClick" HorizontalAlignment="Left"/>
+                    <TextBlock Text="Steam key testing uses one SteamID64 or profile URL entered above." TextWrapping="Wrap" Foreground="#BCC8D9"/>
+                    <TextBlock Text="Leetify API key (optional)" FontWeight="Bold" Foreground="#63D8BD" Margin="0,8,0,0"/>
+                    <TextBlock TextWrapping="Wrap" Foreground="#BCC8D9"
+                               Text="Adds Leetify's official Public CS API to every check: lifetime tracked-match count and win rate, platform ban records (for example FACEIT bans) as account cautions, aim telemetry, available public-profile Premier and Competitive map ranks, and 7-day and 15-day combat trends from available public match history. Ranks and trends are context only. Rank freshness is not established. The key is sent only as a request header to api-public.cs-prod.leetify.com and never appears in reports or evidence."/>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBox x:Name="LeetifyKeyBox" Width="320" PasswordChar="&#x2022;" PlaceholderText="Leetify developer key"/>
+                        <Button x:Name="SaveLeetifyKeyButton" Content="Save key" Click="SaveLeetifyKeyClick"/>
+                        <Button x:Name="RemoveLeetifyKeyButton" Content="Remove key" Click="RemoveLeetifyKeyClick"/>
+                        <Button Content="Get a free Leetify key" Click="OpenLeetifyKeyPageClick"/>
+                    </StackPanel>
+                    <Button x:Name="TestLeetifyKeyButton" Content="Test saved Leetify key" Click="TestLeetifyKeyClick" HorizontalAlignment="Left"/>
+                    <TextBlock Text="FACEIT Data API key (optional)" FontWeight="Bold" Foreground="#63D8BD" Margin="0,8,0,0"/>
+                    <TextBlock TextWrapping="Wrap" Foreground="#BCC8D9"
+                               Text="Adds identity-verified FACEIT CS2 lifetime statistics as unscored context, separate from other samples. The queried SteamID is sent to FACEIT. The key is sent only to open.faceit.com and never appears in reports. A FACEIT developer account and API key are required."/>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBox x:Name="FaceitKeyBox" Width="320" PasswordChar="&#x2022;" PlaceholderText="FACEIT Data API key"/>
+                        <Button Content="Save key" Click="SaveFaceitKeyClick"/>
+                        <Button Content="Remove key" Click="RemoveFaceitKeyClick"/>
+                        <Button Content="Get a free FACEIT key" Click="OpenFaceitKeyPageClick"/>
+                    </StackPanel>
+                    <Button x:Name="TestFaceitKeyButton" Content="Test saved FACEIT key" Click="TestFaceitKeyClick" HorizontalAlignment="Left"/>
+                    <TextBlock Text="Gemini API key (optional gameplay commentary)" FontWeight="Bold" Foreground="#63D8BD" Margin="0,8,0,0"/>
+                    <TextBlock TextWrapping="Wrap" Foreground="#BCC8D9"
+                               Text="Sent only to generativelanguage.googleapis.com. Analyze demo with Gemini automatically sends identifiable video and bounded telemetry; the optional summary-only path sends identity-stripped telemetry. Raw demos are never uploaded. Key testing requests model metadata only; saving makes no request. Google data-use terms and quotas apply, including possible free-tier product improvement and billing-enabled charges."/>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBox x:Name="GeminiKeyBox" Width="320" PasswordChar="&#x2022;" PlaceholderText="Google AI Studio API key"/>
+                        <Button x:Name="SaveGeminiKeyButton" Content="Save key" Click="SaveGeminiKeyClick"/>
+                        <Button x:Name="RemoveGeminiKeyButton" Content="Remove key" Click="RemoveGeminiKeyClick"/>
+                        <Button Content="Get a Gemini key" Click="OpenGeminiKeyPageClick"/>
+                    </StackPanel>
+                    <Button x:Name="TestGeminiKeyButton" Content="Test saved Gemini key" Click="TestGeminiKeyClick" HorizontalAlignment="Left"/>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="Gemini model:" VerticalAlignment="Center"/>
+                        <TextBox x:Name="GeminiModelBox" Width="255" Text="gemini-3.1-flash-lite"/>
+                    </StackPanel>
+                    <TextBlock TextWrapping="Wrap" Foreground="#BCC8D9"
+                               Text="Tests key authentication and metadata access for the model above. No demo data or generation prompt is sent. A pass does not guarantee generation quota, free usage or future availability."/>
+                    <TextBlock x:Name="KeyStatusText" TextWrapping="Wrap" Foreground="#BCC8D9"/>
+                </StackPanel>
+              </ScrollViewer>
+            </TabItem>
+            <TabItem Header="Top Pro Players">
+                <Grid RowDefinitions="Auto,Auto,*,Auto" Margin="0,12,0,0" RowSpacing="8">
+                    <TextBlock TextWrapping="Wrap" Foreground="#BCC8D9"
+                               Text="HLTV 2025 top ten | Includes a dated tournament snapshot. Account sources refresh daily while the app is open, or on demand. Reference only: not a cheating threshold."/>
+                    <Grid Grid.Row="1" ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <Button x:Name="RefreshProStatsButton" Content="Refresh stats" Click="RefreshProStatsClick" IsEnabled="False"/>
+                        <TextBlock Grid.Column="1" x:Name="ProStatsStatus" TextWrapping="Wrap" VerticalAlignment="Center"
+                                   Text="Loading saved pro stats..."/>
+                    </Grid>
+                    <TextBox Grid.Row="2" x:Name="ProStatsBox" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap"/>
+                    <Button Grid.Row="3" x:Name="ProLeetifyAttribution" IsVisible="False"
+                            Click="OpenLeetifyClick" Background="Transparent" Padding="4">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <Image x:Name="ProLeetifyLogo" MaxWidth="70" MaxHeight="18" Stretch="Uniform"/>
+                            <TextBlock Text="Data Provided by Leetify" FontSize="12" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </Grid>
+            </TabItem>
+        </TabControl>
+        <StackPanel Grid.Row="4" x:Name="LeetifyAttribution" IsVisible="False"
+                    Orientation="Horizontal" Spacing="8" Margin="0,6,0,0">
+            <Button Click="OpenLeetifyClick" Background="Transparent" Padding="4">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Image x:Name="LeetifyLogo" MaxWidth="70" MaxHeight="18" Stretch="Uniform"/>
+                    <TextBlock Text="Data Provided by Leetify" FontSize="12" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+            <TextBlock Text="Not affiliated with Leetify." FontSize="11" Foreground="#BCC8D9" VerticalAlignment="Center"/>
+        </StackPanel>
+    </Grid>
+</Window>

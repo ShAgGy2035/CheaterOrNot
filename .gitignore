@@ -1,0 +1,27 @@
+﻿# Build output
+**/bin/
+**/obj/
+**/TestResults/
+.vs/
+
+# Published/packaged builds (binaries, tools, review videos)
+/publish*/
+
+# Local tooling/workspace state
+/.vscode/
+/system/
+
+# User/diagnostic artifacts
+*.user
+*.suo
+*.trx
+*.dmp
+*.log
+/reports/
+/report*.txt
+
+# Secrets
+.env
+*.pfx
+*.key
+appsettings.*.local.json

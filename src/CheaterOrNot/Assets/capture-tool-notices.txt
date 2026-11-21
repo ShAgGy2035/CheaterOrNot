@@ -1,0 +1,57 @@
+PORTABLE CAPTURE COMPONENTS
+
+CS Demo Manager
+Project/source: https://github.com/akiver/cs-demo-manager
+License: MIT (below). The extracted runtime also includes Electron/Chromium,
+PostgreSQL and other upstream components; preserve their accompanying notices.
+
+The MIT License (MIT)
+
+Copyright (c) 2014-present AkiVer
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+FFmpeg
+Project/source: https://ffmpeg.org/
+Build distribution/scripts: https://github.com/FFmpeg-Builds/FFmpeg-Builds
+The selected unmodified Windows shared build is LGPL v3, not the GPL/nonfree
+variant. Its LICENSE.txt and documentation remain in the encoder directory.
+The encoder is a separate executable; its shared libraries are not statically
+linked into this app. libopenh264 encodes H.264 and AAC encodes game audio.
+Official public publish outputs do not contain FFmpeg or other capture-tool
+binaries. On first use, the app downloads the verified upstream archive
+directly, records its release URL, size and SHA-256, and keeps its upstream
+license files. Do not redistribute a configured tools directory.
+
+7-Zip
+Project/source: https://www.7-zip.org/
+Release source: https://github.com/ip7z/7zip/releases/tag/26.06
+The extracted distribution includes its original License.txt and readme.txt.
+The reduced 7zr bootstrap is public domain; full 7-Zip has additional licensing
+conditions, including the unRAR restriction. Preserve the upstream files.
+
+The active tools/capture-tools.json records component download URLs, release
+tags, archive sizes and SHA-256 digests. Upstream executables are unmodified.
+Steam and CS2 are not included and must be obtained separately from Valve.
+
+PUBLIC PUBLISHES MUST NOT INCLUDE CAPTURE-TOOL BINARIES.
+The app deliberately excludes FFmpeg, CS Demo Manager and 7-Zip components
+from release artifacts so users obtain those components from their upstream
+releases instead of receiving redistributed copies from this project.
+Never distribute tools/data, credentials, imported demos or review-videos.

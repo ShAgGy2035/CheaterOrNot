@@ -63,20 +63,29 @@ temporarily requires substantial free disk space.
 
 ## Install and start
 
-Build artifacts are not stored in this repository. Build the portable Windows
-x64 app from source (requires the .NET SDK):
+Download the portable Windows x64 build from the
+[Releases page](https://github.com/ShAgGy2035/CheaterOrNot/releases). No
+installer or separate .NET install is needed.
+
+1. Download `CheaterOrNot-v0.0.1-win-x64.zip` (or the latest version) from the
+   newest release.
+2. Extract the complete zip to a trusted local folder.
+3. Run `CheaterOrNot.exe`.
+4. If Windows displays an unsigned-application warning, review the warning and
+   only continue if you trust the download.
+
+The app includes its .NET runtime and browser support. Keep the extracted files
+together.
+
+### Build from source (optional)
+
+Requires the .NET SDK:
 
 ```powershell
 dotnet publish src\CheaterOrNot\CheaterOrNot.csproj -c Release -r win-x64 -p:PublishProfile=Portable -o publish
 ```
 
-1. Copy the complete `publish` folder to a trusted local location.
-2. Run `publish\CheaterOrNot.exe`.
-3. If Windows displays an unsigned-application warning, review the warning and
-   only continue if you trust the build.
-
-The published app includes its .NET runtime and browser support. Do not copy
-only the executable if you want the full portable installation.
+The result is `publish\CheaterOrNot.exe`.
 
 ### Capture components
 

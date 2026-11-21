@@ -6,6 +6,7 @@
 
 # Published/packaged builds (binaries, tools, review videos)
 /publish*/
+/release/
 
 # Local tooling/workspace state
 /.vscode/

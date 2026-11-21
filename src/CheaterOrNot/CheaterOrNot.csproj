@@ -3,6 +3,7 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
+    <Version>0.0.1</Version>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\question-mark.ico</ApplicationIcon>
     <BrowserBundlePath Condition="'$(BrowserBundlePath)' == ''">$(MSBuildProjectDirectory)\bin\$(Configuration)\$(TargetFramework)\browsers</BrowserBundlePath>

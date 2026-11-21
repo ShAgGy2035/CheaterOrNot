@@ -12,7 +12,7 @@ The portable Windows x64 application is [publish/CheaterOrNot.exe](publish/Cheat
 
 Single-file distribution does not mean zero runtime files. .NET extracts executable/runtime/browser assets into its per-user extraction cache (normally `%TEMP%\.net` on Windows). Those assets are retained for subsequent launches; they are not downloaded player pages. If overriding `DOTNET_BUNDLE_EXTRACT_BASE_DIR`, use a short path on Windows to avoid extraction path-length limits. Keep the executable updated to receive bundled runtime/browser fixes.
 
-Development remains at version 1.0.0. Ordinary builds are not separate releases. Update the same working executable, close it before replacing it, and do not generate additional publish folders or ZIPs for routine development.
+Development remains at version 0.0.1. Ordinary builds are not separate releases. Update the same working executable, close it before replacing it, and do not generate additional publish folders or ZIPs for routine development.
 
 The application uses a plain mint question mark on a transparent background. Editable artwork is in [question-mark.svg](src/CheaterOrNot/Assets/question-mark.svg). The Leetify logo is provider attribution only, not the app icon.
 

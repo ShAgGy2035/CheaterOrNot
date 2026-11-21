@@ -63,17 +63,20 @@ temporarily requires substantial free disk space.
 
 ## Install and start
 
-The portable Windows x64 build is:
+Build artifacts are not stored in this repository. Build the portable Windows
+x64 app from source (requires the .NET SDK):
 
-[publish/CheaterOrNot.exe](publish/CheaterOrNot.exe)
+```powershell
+dotnet publish src\CheaterOrNot\CheaterOrNot.csproj -c Release -r win-x64 -p:PublishProfile=Portable -o publish
+```
 
 1. Copy the complete `publish` folder to a trusted local location.
-2. Run `CheaterOrNot.exe`.
+2. Run `publish\CheaterOrNot.exe`.
 3. If Windows displays an unsigned-application warning, review the warning and
-   only continue if you trust where you obtained the build.
+   only continue if you trust the build.
 
-The application includes its .NET runtime and browser support. Do not copy only
-the executable if you want the full portable installation.
+The published app includes its .NET runtime and browser support. Do not copy
+only the executable if you want the full portable installation.
 
 ### Capture components
 
